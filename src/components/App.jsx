@@ -4,11 +4,28 @@ import { Filter } from 'components/Filter/Filter';
 import { ContactList } from 'components/ContactList/ContactList';
 import { Container } from 'components/App.styled';
 
+const keyContacts = 'contacts';
+
 export class App extends Component {
   state = {
     contacts: [],
     filter: '',
   };
+
+  componentDidMount() {
+    const contacts = localStorage.getItem(keyContacts);
+    const parsedContacts = JSON.parse(contacts);
+
+    if (parsedContacts) {
+      this.setState({ contacts: parsedContacts });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.contacts !== prevState.contacts) {
+      localStorage.setItem(keyContacts, JSON.stringify(this.state.contacts));
+    }
+  }
 
   deleteTodo = todoId => {
     this.setState(prevState => ({
@@ -42,21 +59,6 @@ export class App extends Component {
       contact.name.toLowerCase().includes(normalizedFilter)
     );
   };
-
-  componentDidMount() {
-    const contacts = localStorage.getItem('contacts');
-    const parsedContacts = JSON.parse(contacts);
-
-    if (parsedContacts) {
-      this.setState({ contacts: parsedContacts });
-    }
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.contacts !== prevState.contacts) {
-      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
-    }
-  }
 
   render() {
     const filtredContacts = this.getFiltredContacts();
